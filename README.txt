@@ -1,0 +1,1 @@
+Boussole Flow V3 alpha — TEST LOCAL. Décompresser le ZIP puis ouvrir index.html dans Chrome. Ne pas commit sur GitHub avant validation.
