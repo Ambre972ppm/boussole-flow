@@ -1,25 +1,20 @@
-# Boussole Flow — V3 test
+# Boussole Flow V2
 
-Version de test à publier sur une branche GitHub séparée.
+Application d'exploration professionnelle conçue pour aider à identifier :
+- les moteurs de Flow,
+- les forces et ressources transférables,
+- les environnements de travail favorables,
+- les risques de décrochage,
+- des pistes métiers classées par compatibilité et accessibilité.
 
-## Fichiers
-- `index.html`
-- `styles.css`
-- `app.js`
-- `.nojekyll`
+## Déploiement GitHub Pages
 
-## Pour tester avec GitHub Pages
-Si GitHub Pages de ce dépôt pointe déjà sur `main`, le plus simple est soit :
-1. de changer temporairement la branche Pages vers la branche V3 test,
-2. ou de fusionner plus tard la V3 dans `main` une fois validée.
+Le projet est statique et ne nécessite aucun build.
 
-La version V3 test contient :
-- charte violette
-- visuel mental intégré en SVG
-- questionnaire multi-profils
-- recommandations métiers multi-secteurs
-- sauvegarde locale
-- impression / PDF
-- partage via application e-mail
+1. Déposer `index.html`, `styles.css`, `app.js` et `.nojekyll` à la racine du dépôt.
+2. Dans GitHub : Settings → Pages.
+3. Source : Deploy from a branch.
+4. Branch : `main`, dossier `/ (root)`.
+5. Sauvegarder.
 
-Important : l'e-mail actuel utilise `mailto:`. Un véritable envoi automatique nécessitera un service backend.
+Le site sera ensuite disponible sur l'URL GitHub Pages du dépôt.
