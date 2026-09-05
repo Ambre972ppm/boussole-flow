@@ -1,20 +1,34 @@
-# Boussole Flow V2
+# Boussole Flow — Projet complet V9
 
-Application d'exploration professionnelle conçue pour aider à identifier :
-- les moteurs de Flow,
-- les forces et ressources transférables,
-- les environnements de travail favorables,
-- les risques de décrochage,
-- des pistes métiers classées par compatibilité et accessibilité.
+## Fichiers
+- `index.html` : structure principale
+- `styles.css` : design complet
+- `app.js` : questionnaire, import CV, matching, résultats
+- `CAHIER_DES_CHARGES.md` : cahier des charges consolidé à jour
 
-## Déploiement GitHub Pages
+## Test local
+Ouvrir `index.html` dans un navigateur.
 
-Le projet est statique et ne nécessite aucun build.
+Pour tester correctement l’import CV PDF/DOCX, il est préférable de déployer sur Vercel
+car certaines bibliothèques sont chargées depuis le web.
 
-1. Déposer `index.html`, `styles.css`, `app.js` et `.nojekyll` à la racine du dépôt.
-2. Dans GitHub : Settings → Pages.
-3. Source : Deploy from a branch.
-4. Branch : `main`, dossier `/ (root)`.
-5. Sauvegarder.
+## Déploiement Vercel
+1. mettre ces fichiers sur la branche `V6-preview`
+2. commit
+3. attendre la Preview Deployment Vercel
+4. ouvrir l’URL de preview dans Safari/Chrome
 
-Le site sera ensuite disponible sur l'URL GitHub Pages du dépôt.
+## Fonctionnalités intégrées
+- 40 questions de fonctionnement
+- centres d’intérêt gradués 0–4
+- sous-thèmes pour passions fortes
+- taxonomie large
+- import CV PDF/DOCX/TXT
+- LinkedIn présenté comme connexion future
+- expériences structurées
+- diplômes conditionnels
+- compétences par niveau et source
+- contraintes réelles
+- résultats identité → forces → axes → conditions → domaines → métiers dépliables
+- accessibilité séparée de l’affinité
+- simple expérience de secteur = faible bonus seulement
