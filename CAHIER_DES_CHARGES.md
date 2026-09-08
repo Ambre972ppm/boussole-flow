@@ -508,3 +508,102 @@ Le lecteur PDF doit charger explicitement :
 Un PDF constitué uniquement d’images ne contient pas de texte sélectionnable.
 Le prototype doit l’indiquer clairement plutôt que d’inventer des données.
 L’OCR est une fonctionnalité future distincte.
+
+
+---
+
+## V9.2 — Centres d’intérêt élargis
+
+Chaque grand centre d’intérêt doit proposer un ensemble suffisamment riche de sous-thèmes.
+La taxonomie ne doit pas donner l’impression qu’un univers est limité à 3 ou 4 exemples.
+
+Exemple « Animaux » :
+- chiens
+- chats
+- chevaux
+- oiseaux
+- animaux de ferme
+- NAC
+- animaux marins
+- faune sauvage
+- reptiles
+- insectes
+- éducation animale
+- soins animaliers
+- protection animale
+- observation animale
+
+Chaque catégorie comporte aussi un champ **Autre / préciser**.
+Les éléments personnalisés sont conservés pour enrichir le profil, mais ne doivent pas produire
+de score automatique tant que le moteur ne sait pas les interpréter de façon fiable.
+
+## V9.2 — LinkedIn
+
+### Disponible immédiatement
+Import des données LinkedIn téléchargées par l’utilisateur :
+- archive ZIP
+- fichiers CSV
+
+Le prototype recherche notamment :
+- positions / expériences
+- dates
+- formations
+- compétences
+
+Les éléments détectés passent par le même écran de confirmation que le CV.
+
+### Connexion directe future
+Préparer une intégration OAuth sécurisée avec un backend.
+La connexion standard OpenID Connect ne suffit pas pour récupérer l’ensemble de l’historique professionnel.
+Pour les membres éligibles UE/EEE/Suisse, étudier l’intégration LinkedIn Member Portability API,
+sous réserve de l’accès développeur et des autorisations LinkedIn.
+
+Ne jamais scraper un profil public à partir de son URL.
+
+
+---
+
+## V9.3 — Connexion LinkedIn directe
+
+Une connexion OAuth/OpenID Connect LinkedIn est ajoutée via Vercel Functions.
+
+Variables d’environnement :
+- `LINKEDIN_CLIENT_ID`
+- `LINKEDIN_CLIENT_SECRET`
+- `APP_URL`
+
+Scopes de test :
+- `openid`
+- `profile`
+- `email`
+
+Cette connexion récupère un profil léger (identité/photo/email autorisé).
+Elle ne doit pas être présentée comme une extraction complète du CV LinkedIn.
+L’historique pro reste importable via l’archive ZIP/CSV tant que les droits de portabilité ne sont pas accordés.
+
+## V9.3 — Envoi du bilan par email
+
+Le bilan complet peut être envoyé depuis l’écran de résultats via `/api/send-report`.
+
+Configuration Vercel :
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL` (optionnel, recommandé avec un domaine vérifié)
+
+L’email contient le rapport complet en HTML.
+
+## V9.3 — Export PDF complet
+
+Le bouton PDF ne doit plus imprimer l’écran courant.
+Il génère un document indépendant contenant :
+- identité professionnelle
+- points forts
+- axes d’évolution
+- conditions de durabilité
+- domaines
+- jusqu’à 6 métiers par domaine
+- justification
+- acquis
+- manques
+- mini-test
+
+Tous les accordéons sont donc inclus même s’ils sont fermés dans l’interface.
