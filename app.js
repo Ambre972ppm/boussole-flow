@@ -73,7 +73,8 @@ function linkedinScreen(){
   <section class="section importHero">
     <p class="eyebrow">LinkedIn</p>
     <h2>Utiliser ton parcours LinkedIn</h2>
-    <p class="sub">Deux possibilités : importer tes données LinkedIn dès maintenant, ou préparer la future connexion directe.</p>
+    <p class="sub">Deux possibilités : connecter ton compte LinkedIn ou importer tes données LinkedIn pour récupérer ton parcours.</p>
+    ${st.linkedinProfile?.name?`<div class="connectedBadge">✓ LinkedIn connecté : <b>${esc(st.linkedinProfile.name)}</b>${st.linkedinProfile.email?' • '+esc(st.linkedinProfile.email):''}</div>`:''}
   </section>
   <div class="importChoices section">
     <button class="importChoice featured" onclick="linkedinArchiveScreen()">
@@ -89,12 +90,32 @@ function linkedinScreen(){
 }
 function linkedinDirectInfo(){
   app.innerHTML=`<div class="wrap">${brand()}${steps('Expériences')}
-  <section class="section"><p class="eyebrow">Connexion LinkedIn directe</p><h2>Architecture prête, autorisation LinkedIn nécessaire</h2>
-  <p class="sub">Boussole pourra connecter le compte avec le consentement de l’utilisateur. La version standard de connexion LinkedIn ne renvoie pas tout l’historique professionnel. Pour accéder aux données de portabilité, il faut enregistrer l’application auprès de LinkedIn et obtenir les droits adaptés.</p></section>
-  <div class="card section"><h3>Ce qui sera récupéré après autorisation</h3><ul><li>expériences et dates disponibles</li><li>formations et diplômes disponibles</li><li>compétences disponibles</li><li>informations de profil utiles</li></ul></div>
-  <div class="notice section"><b>En attendant :</b> l’import de l’archive LinkedIn te permet déjà de tester le parcours sans tout saisir manuellement.</div>
-  <div class="actions"><button class="btn" onclick="linkedinScreen()">← Retour</button><button class="btn primary" onclick="linkedinArchiveScreen()">Importer mes données LinkedIn</button></div></div>`;
+  <section class="section"><p class="eyebrow">Connexion LinkedIn directe</p><h2>Connecter ton compte LinkedIn</h2>
+  <p class="sub">Cette connexion peut déjà récupérer ton identité LinkedIn (nom, photo et email autorisé). Pour importer automatiquement tout l’historique professionnel, LinkedIn demande des autorisations de portabilité supplémentaires : l’import ZIP/CSV reste disponible pour compléter ton parcours.</p></section>
+  <div class="card section">
+    <h3>Ce que nous pouvons tester maintenant</h3>
+    <ul><li>connexion sécurisée LinkedIn</li><li>nom et photo de profil</li><li>email si tu l’autorises</li><li>association de la connexion à ton exploration Boussole</li></ul>
+    <button class="btn primary" onclick="connectLinkedIn()">Connecter LinkedIn →</button>
+  </div>
+  <div class="notice section"><b>Pour les expériences :</b> après connexion, tu peux toujours importer ton archive LinkedIn afin de préremplir les postes, dates, formations et compétences.</div>
+  <div class="actions"><button class="btn" onclick="linkedinScreen()">← Retour</button><button class="btn" onclick="linkedinArchiveScreen()">Importer mes données LinkedIn</button></div></div>`;
 }
+function connectLinkedIn(){
+  window.location.href='/api/linkedin-login';
+}
+function captureLinkedInConnection(){
+  const u=new URL(window.location.href);
+  if(u.searchParams.get('linkedin')!=='connected')return;
+  const profile={
+    name:u.searchParams.get('name')||'',
+    email:u.searchParams.get('email')||'',
+    picture:u.searchParams.get('picture')||''
+  };
+  st.linkedinProfile=profile;save();
+  u.searchParams.delete('linkedin');u.searchParams.delete('name');u.searchParams.delete('email');u.searchParams.delete('picture');
+  history.replaceState({},'',u.pathname+(u.search?'?'+u.searchParams.toString():''));
+}
+
 
 
 function linkedinArchiveScreen(){
@@ -455,10 +476,81 @@ function durability(job,sc,aff){let d=aff;const mm=[];if(job.physical>st.constra
 function confidence(){let c=35+Math.min(30,st.answers.length*.75);c+=Math.min(10,Object.values(st.interestRatings).filter(x=>x>0).length*.4);c+=Math.min(10,st.experiences.length*3);c+=Math.min(8,st.quals.length*3);c+=Math.min(10,st.skills.length*2);return Math.min(98,Math.round(c))}
 function compute(){const sc=traitScores(),p=profile(sc),conf=confidence();const ranked=DATA.jobs.map(j=>{const m=mental(j,sc),intr=interestScore(j),deep=Math.round(m*.45+intr*.55),acc=accessibility(j),cap=Math.round(skillProof(j)*.55+qualProof(j)*.25+Math.min(100,exactYears(j)*28)*.20),dur=durability(j,sc,Math.round(deep*.55+m*.45));let global=Math.round(deep*.28+m*.24+cap*.16+acc*.17+dur.score*.15);if(deep<40)global=Math.min(global,58);if(dur.score<40)global=Math.min(global,56);return{j,m,intr,deep,acc,cap,dur:dur.score,mismatch:dur.mismatch,global,confidence:conf,ey:exactYears(j),sy:sectorYears(j)}}).sort((a,b)=>b.global-a.global);st.result={sc,p,ranked,confidence:conf};st.screen='result';save();results()}
 function classify(x){if(x.deep>=68&&x.m>=62&&x.acc>=65&&x.dur>=65)return'now';if(x.deep>=68&&x.m>=62&&x.acc<65)return'reconversion';if(x.acc>=78&&x.deep<56)return'access';return'explore'}
+
+function fullReportHTML(){
+  const r=st.result;if(!r)return '';
+  const tops=topTraits(r.sc,6);
+  const domains=domainScores(r.ranked).slice(0,6);
+  const strengths=strengthItems(r.sc),growth=growthItems(r.sc),conditions=durabilityItems(r.sc);
+  const domainHtml=domains.map((d,idx)=>`
+    <section class="reportDomain">
+      <h2>${idx+1}. ${esc(d.sector)} — ${band(d.score)} cohérence</h2>
+      <p>${esc(domainWhy(d))}</p>
+      ${d.jobs.slice(0,6).map(x=>`
+        <article class="reportJob">
+          <h3>${esc(x.j.name)}</h3>
+          <p><b>Pourquoi :</b> ${esc(jobWhy(x))}</p>
+          <p>${esc(x.j.desc)}</p>
+          <h4>Ce que tu as déjà</h4>
+          <ul>${jobBring(x).map(v=>`<li>${esc(v)}</li>`).join('')}</ul>
+          <h4>À vérifier</h4>
+          <ul>${jobGap(x).map(v=>`<li>${esc(v)}</li>`).join('')}</ul>
+          <h4>Comment le tester</h4><p>${esc(jobTest(x))}</p>
+          ${x.mismatch.length?`<p><b>Point de vigilance :</b> ${x.mismatch.map(esc).join(' • ')}</p>`:''}
+        </article>`).join('')}
+    </section>`).join('');
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Bilan Boussole Flow</title>
+  <style>
+  body{font-family:Arial,Helvetica,sans-serif;color:#2d2441;max-width:900px;margin:auto;padding:34px;line-height:1.5}
+  h1,h2{font-family:Georgia,serif;color:#432971}h1{font-size:38px}h2{margin-top:34px;border-bottom:1px solid #e7dcef;padding-bottom:8px}
+  h3{margin-bottom:6px}.hero{background:#f5effb;border:1px solid #e4d6f3;border-radius:20px;padding:22px}
+  .tag{display:inline-block;margin:4px;padding:6px 9px;border-radius:999px;background:#eee4f8;font-size:12px}
+  .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.box{border:1px solid #e7dcef;border-radius:14px;padding:14px}
+  .reportJob{break-inside:avoid;border:1px solid #e7dcef;border-radius:14px;padding:15px;margin:12px 0;background:#fff}
+  .reportDomain{break-before:auto}.foot{margin-top:40px;padding-top:15px;border-top:1px solid #ddd;color:#756c83;font-size:12px}
+  @media print{body{max-width:none;padding:0}.cols{grid-template-columns:repeat(3,1fr)}}
+  </style></head><body>
+  <div class="hero"><div style="font-weight:900">✦ BOUSSOLE FLOW</div>
+    <h1>${esc(r.p[0])}</h1><p>${esc(identityText(r.sc))}</p>
+    <div>${tops.slice(0,5).map(([k])=>`<span class="tag">${esc(DATA.dims[k])}</span>`).join('')}</div>
+  </div>
+  <div class="cols">
+    <div class="box"><h3>Points forts</h3><ul>${strengths.map(v=>`<li>${esc(v)}</li>`).join('')}</ul></div>
+    <div class="box"><h3>Axes d’évolution</h3><ul>${growth.map(v=>`<li>${esc(v)}</li>`).join('')}</ul></div>
+    <div class="box"><h3>Conditions pour durer</h3><ul>${conditions.map(v=>`<li>${esc(v)}</li>`).join('')}</ul></div>
+  </div>
+  <h1 style="font-size:30px;margin-top:38px">Tes domaines et métiers à explorer</h1>
+  ${domainHtml}
+  <div class="foot">Boussole est un outil d’exploration professionnelle. Les résultats sont construits à partir de ton parcours, de tes préférences et de ton fonctionnement.</div>
+  </body></html>`;
+}
+function downloadFullPDF(){
+  const html=fullReportHTML();if(!html)return;
+  const w=window.open('','_blank');
+  if(!w){alert("Autorise les fenêtres pop-up pour générer le bilan complet.");return}
+  w.document.open();w.document.write(html);w.document.close();
+  setTimeout(()=>{w.focus();w.print()},450);
+}
+async function sendResultsByEmail(){
+  if(!st.result){alert("Aucun bilan à envoyer.");return}
+  const def=st.linkedinProfile?.email||'';
+  const email=prompt("À quelle adresse veux-tu recevoir ton bilan ?",def);
+  if(!email)return;
+  const html=fullReportHTML();
+  try{
+    const resp=await fetch('/api/send-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:email,html})});
+    const data=await resp.json().catch(()=>({}));
+    if(!resp.ok)throw new Error(data.error||"Envoi impossible.");
+    alert("Ton bilan complet a été envoyé à "+email+".");
+  }catch(err){
+    alert("L’envoi par mail n’est pas encore configuré sur ce déploiement : "+(err.message||err));
+  }
+}
+
 function results(){const r=st.result;if(!r)return home();const top=Object.entries(r.sc).sort((a,b)=>b[1]-a[1]).slice(0,9),groups={now:[],reconversion:[],explore:[],access:[]};r.ranked.slice(0,32).forEach(x=>groups[classify(x)].push(x));function cards(arr){return arr.slice(0,10).map(x=>`<article class="job"><span class="family">${x.j.sector}</span><h3>${x.j.name}</h3><div class="scores"><span class="score">💜 ${x.deep}%</span><span class="score">🧠 ${x.m}%</span><span class="score c">🛠️ ${x.cap}%</span><span class="score a">🚀 ${x.acc}%</span><span class="score d">🌱 ${x.dur}%</span></div><p><b>Compatibilité durable : ${x.global}%</b></p><p>${x.j.desc}</p>${x.ey>0?`<div class="detail"><b>Preuve forte :</b> ${x.ey} an(s) d’expérience directe déclarée dans ce métier.</div>`:x.sy>0?`<div class="detail"><b>Expérience secteur :</b> ${x.sy} an(s) dans ${x.j.sector}.</div>`:''}<p class="confidence">Confiance du calcul : ${x.confidence}%</p>${x.mismatch.length?`<div class="detail"><b>Points de vigilance :</b> ${x.mismatch.join(' ; ')}.</div>`:''}</article>`).join('')||'<p class="sub">Aucune piste forte dans cette catégorie pour le moment.</p>'}
 app.innerHTML=`<div class="wrap">${brand()}${steps('Résultats')}<div class="resultHero"><div class="profile"><p class="eyebrow" style="color:#d8c7ff">Ton profil</p><h1>${r.p[0]}</h1><p>${r.p[1]}</p><p><b>Moteurs dominants :</b> ${top.slice(0,5).map(x=>DATA.dims[x[0]]).join(' • ')}</p></div><div class="meters"><h3>Ta carte de fonctionnement</h3>${top.map(([k,v])=>`<div class="meterrow"><span>${DATA.dims[k]}</span><div class="meter"><i style="width:${v}%"></i></div><b>${v}</b></div>`).join('')}</div></div><div class="group"><h2>Très cohérent aujourd’hui</h2><p class="sub">Affinité, fonctionnement, preuves de parcours, accessibilité et durabilité sont suffisamment alignés.</p><div class="jobs">${cards(groups.now)}</div></div><div class="group"><h2>Forte affinité, mais transition à construire</h2><p class="sub">Ces métiers peuvent te correspondre, mais ton parcours actuel ne permet pas encore un accès simple.</p><div class="jobs">${cards(groups.reconversion)}</div></div><div class="group"><h2>Pistes à explorer</h2><div class="jobs">${cards(groups.explore)}</div></div><div class="group"><h2>Accessible, mais peut-être peu nourrissant</h2><p class="sub">Ton parcours peut permettre ces métiers, mais l’affinité profonde ressort moins forte.</p><div class="jobs">${cards(groups.access)}</div></div><div class="actions"><button class="btn" onclick="try{localStorage.setItem('boussoleFlowV7Result',JSON.stringify(st.result));alert('Bilan enregistré sur cet appareil.')}catch(e){}">💾 Enregistrer</button><button class="btn" onclick="window.print()">📄 PDF / imprimer</button><button class="btn" onclick="restart()">↻ Refaire</button></div><div class="notice"><b>Important :</b> Boussole est un outil d’exploration professionnelle. Les résultats sont construits à partir de ton parcours, de tes préférences et de ton fonctionnement pour t’aider à identifier des environnements et des métiers à explorer.</div></div>`}
 function restart(){if(confirm('Recommencer tout le test ?')){try{localStorage.removeItem(KEY)}catch(e){}st=defaultState();home()}}
-try{home()}catch(err){app.innerHTML='<div style="max-width:760px;margin:40px auto;padding:24px;font-family:system-ui;background:white;border:1px solid #eadff4;border-radius:20px"><h2>Boussole Flow n’a pas pu démarrer</h2><p>'+esc(err.message||err)+'</p></div>'}
+try{captureLinkedInConnection();home()}catch(err){app.innerHTML='<div style="max-width:760px;margin:40px auto;padding:24px;font-family:system-ui;background:white;border:1px solid #eadff4;border-radius:20px"><h2>Boussole Flow n’a pas pu démarrer</h2><p>'+esc(err.message||err)+'</p></div>'}
 
 
 window.addEventListener('error', function(ev){
@@ -491,4 +583,4 @@ function jobGap(x){const o=[];if(x.j.cert&&qualProof(x.j)<40)o.push('Une qualifi
 function jobTest(x){if(x.j.sector.includes('Numérique'))return 'Tester un mini-projet ou échanger avec une personne qui exerce ce métier sur son quotidien réel.';if(x.j.sector.includes('Beauté')||x.j.sector.includes('Bien-être'))return 'Observer une journée, participer à un atelier découverte ou réaliser une immersion courte avant toute formation.';if(x.j.sector.includes('Santé')||x.j.sector.includes('Social'))return 'Faire une immersion ou un entretien métier pour tester la réalité humaine, émotionnelle et physique du poste.';return 'Parler à deux professionnels puis tester une tâche représentative avant d’investir dans une reconversion.'}
 function domainIcon(s){if(/Numérique/.test(s))return'💻';if(/Beauté/.test(s))return'✨';if(/Bien-être/.test(s))return'🌿';if(/Santé|Psychologie|Social|Éducation/.test(s))return'🤝';if(/Création|Communication|Culture/.test(s))return'🎨';if(/Nature|Animaux/.test(s))return'🌱';if(/Bâtiment|Industrie/.test(s))return'🛠️';if(/Commerce|Immobilier|Entrepreneuriat/.test(s))return'🚀';if(/Finance|Administration|RH|Droit/.test(s))return'📋';return'🧭'}
 let openDomain=null,openJob=null;function toggleDomain(s){openDomain=openDomain===s?null:s;openJob=null;results()}function toggleJob(n){openJob=openJob===n?null:n;results()}
-results=function(){const r=st.result;if(!r)return home();const tops=topTraits(r.sc,6),domains=domainScores(r.ranked).slice(0,6),strengths=strengthItems(r.sc),growth=growthItems(r.sc),conditions=durabilityItems(r.sc);const dc=domains.map((d,i)=>{const op=openDomain===d.sector,jobs=d.jobs.slice(0,6);return `<section class="domainCard ${op?'open':''}"><button class="domainHead" onclick='toggleDomain(${JSON.stringify(d.sector)})'><div class="domainIcon">${domainIcon(d.sector)}</div><div class="domainMain"><h3>${i+1}. ${d.sector}</h3><p>${domainWhy(d)}</p></div><div class="domainLevel"><span>${band(d.score)} cohérence</span><b>${op?'−':'+'}</b></div></button>${op?`<div class="domainBody"><p class="sub">Voici les métiers de ce domaine qui collent le mieux à ton profil.</p><div class="jobAccordion">${jobs.map(x=>{const oj=openJob===x.j.name;return `<article class="jobRow"><button class="jobRowHead" onclick='toggleJob(${JSON.stringify(x.j.name)})'><div><span class="jobName">${x.j.name}</span><span class="jobReason">${jobWhy(x)}</span></div><div class="jobBadges"><span>${band(x.deep)} affinité</span><span>${accessLabel(x.acc)}</span><b>${oj?'−':'+'}</b></div></button>${oj?`<div class="jobReveal"><div class="revealGrid"><div><h4>Pourquoi ce métier ?</h4><p>${x.j.desc}</p><p><b>Boussole le relie surtout à :</b> ${jobWhy(x)}.</p></div><div><h4>Ce que tu as déjà</h4><ul>${jobBring(x).map(v=>`<li>${v}</li>`).join('')}</ul></div><div><h4>Ce qu’il faudrait vérifier</h4><ul>${jobGap(x).map(v=>`<li>${v}</li>`).join('')}</ul></div><div><h4>Comment le tester</h4><p>${jobTest(x)}</p></div></div>${x.mismatch.length?`<div class="watch"><b>⚠️ Point de vigilance :</b> ${x.mismatch.join(' • ')}</div>`:''}</div>`:''}</article>`}).join('')}</div></div>`:''}</section>`}).join('');app.innerHTML=`<div class="wrap">${brand()}${steps('Résultats')}<section class="resultHeaderV8"><div><p class="eyebrow">Ton exploration Boussole</p><h1>${r.p[0]}</h1><p class="lead">${identityText(r.sc)}</p><div class="pills">${tops.slice(0,5).map(([k])=>`<span class="pill">${DATA.dims[k]}</span>`).join('')}</div></div><div class="miniCompass"><div class="mcCore">✦</div><span class="mc1">Fonctionnement</span><span class="mc2">Passions</span><span class="mc3">Parcours</span><span class="mc4">Compétences</span></div></section><section class="section"><p class="eyebrow">Ce qui te définit aujourd’hui</p><div class="identityGrid"><div class="insightCard"><div class="insightIcon">◆</div><h3>Tes points forts</h3><ul>${strengths.map(v=>`<li>${v}</li>`).join('')}</ul></div><div class="insightCard"><div class="insightIcon">↗</div><h3>Tes axes d’évolution</h3><ul>${growth.map(v=>`<li>${v}</li>`).join('')}</ul></div><div class="insightCard"><div class="insightIcon">🌿</div><h3>Tes conditions pour durer</h3><ul>${conditions.map(v=>`<li>${v}</li>`).join('')}</ul></div></div></section><section class="section"><div class="sectionTitle"><div><p class="eyebrow">Tes domaines d’avenir</p><h2>Où pourrais-tu te projeter durablement ?</h2></div><p class="sub">Les métiers n’apparaissent que lorsque tu ouvres un domaine.</p></div><div class="domainsList">${dc}</div></section><section class="section resultFooterNote"><h3>À retenir</h3><p>Ces résultats servent à faire émerger des pistes cohérentes à confronter au réel. Ton parcours, tes envies et tes contraintes peuvent évoluer : Boussole est faite pour être affinée avec toi.</p></section><div class="actions"><button class="btn" onclick="window.print()">📄 Imprimer / PDF</button><button class="btn" onclick="restart()">↻ Refaire le test</button></div></div>`}
+results=function(){const r=st.result;if(!r)return home();const tops=topTraits(r.sc,6),domains=domainScores(r.ranked).slice(0,6),strengths=strengthItems(r.sc),growth=growthItems(r.sc),conditions=durabilityItems(r.sc);const dc=domains.map((d,i)=>{const op=openDomain===d.sector,jobs=d.jobs.slice(0,6);return `<section class="domainCard ${op?'open':''}"><button class="domainHead" onclick='toggleDomain(${JSON.stringify(d.sector)})'><div class="domainIcon">${domainIcon(d.sector)}</div><div class="domainMain"><h3>${i+1}. ${d.sector}</h3><p>${domainWhy(d)}</p></div><div class="domainLevel"><span>${band(d.score)} cohérence</span><b>${op?'−':'+'}</b></div></button>${op?`<div class="domainBody"><p class="sub">Voici les métiers de ce domaine qui collent le mieux à ton profil.</p><div class="jobAccordion">${jobs.map(x=>{const oj=openJob===x.j.name;return `<article class="jobRow"><button class="jobRowHead" onclick='toggleJob(${JSON.stringify(x.j.name)})'><div><span class="jobName">${x.j.name}</span><span class="jobReason">${jobWhy(x)}</span></div><div class="jobBadges"><span>${band(x.deep)} affinité</span><span>${accessLabel(x.acc)}</span><b>${oj?'−':'+'}</b></div></button>${oj?`<div class="jobReveal"><div class="revealGrid"><div><h4>Pourquoi ce métier ?</h4><p>${x.j.desc}</p><p><b>Boussole le relie surtout à :</b> ${jobWhy(x)}.</p></div><div><h4>Ce que tu as déjà</h4><ul>${jobBring(x).map(v=>`<li>${v}</li>`).join('')}</ul></div><div><h4>Ce qu’il faudrait vérifier</h4><ul>${jobGap(x).map(v=>`<li>${v}</li>`).join('')}</ul></div><div><h4>Comment le tester</h4><p>${jobTest(x)}</p></div></div>${x.mismatch.length?`<div class="watch"><b>⚠️ Point de vigilance :</b> ${x.mismatch.join(' • ')}</div>`:''}</div>`:''}</article>`}).join('')}</div></div>`:''}</section>`}).join('');app.innerHTML=`<div class="wrap">${brand()}${steps('Résultats')}<section class="resultHeaderV8"><div><p class="eyebrow">Ton exploration Boussole</p><h1>${r.p[0]}</h1><p class="lead">${identityText(r.sc)}</p><div class="pills">${tops.slice(0,5).map(([k])=>`<span class="pill">${DATA.dims[k]}</span>`).join('')}</div></div><div class="miniCompass"><div class="mcCore">✦</div><span class="mc1">Fonctionnement</span><span class="mc2">Passions</span><span class="mc3">Parcours</span><span class="mc4">Compétences</span></div></section><section class="section"><p class="eyebrow">Ce qui te définit aujourd’hui</p><div class="identityGrid"><div class="insightCard"><div class="insightIcon">◆</div><h3>Tes points forts</h3><ul>${strengths.map(v=>`<li>${v}</li>`).join('')}</ul></div><div class="insightCard"><div class="insightIcon">↗</div><h3>Tes axes d’évolution</h3><ul>${growth.map(v=>`<li>${v}</li>`).join('')}</ul></div><div class="insightCard"><div class="insightIcon">🌿</div><h3>Tes conditions pour durer</h3><ul>${conditions.map(v=>`<li>${v}</li>`).join('')}</ul></div></div></section><section class="section"><div class="sectionTitle"><div><p class="eyebrow">Tes domaines d’avenir</p><h2>Où pourrais-tu te projeter durablement ?</h2></div><p class="sub">Les métiers n’apparaissent que lorsque tu ouvres un domaine.</p></div><div class="domainsList">${dc}</div></section><section class="section resultFooterNote"><h3>À retenir</h3><p>Ces résultats servent à faire émerger des pistes cohérentes à confronter au réel. Ton parcours, tes envies et tes contraintes peuvent évoluer : Boussole est faite pour être affinée avec toi.</p></section><div class="actions"><button class="btn primary" onclick="downloadFullPDF()">📄 Télécharger mon bilan complet (PDF)</button><button class="btn" onclick="sendResultsByEmail()">✉️ M’envoyer mon bilan par mail</button><button class="btn" onclick="restart()">↻ Refaire le test</button></div></div>`}

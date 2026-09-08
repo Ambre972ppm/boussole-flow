@@ -31,3 +31,25 @@ Un PDF scanné (image uniquement) nécessitera un futur module OCR.
 ### Pour récupérer ses données LinkedIn
 Dans LinkedIn : Paramètres et confidentialité → Confidentialité des données → Télécharger vos données.
 L’utilisateur peut ensuite importer l’archive reçue dans Boussole Flow.
+
+
+## V9.3 — Configuration Vercel
+
+### LinkedIn direct
+Créer une application LinkedIn Developer, activer Sign In with LinkedIn using OpenID Connect,
+puis définir dans Vercel :
+- `LINKEDIN_CLIENT_ID`
+- `LINKEDIN_CLIENT_SECRET`
+- `APP_URL`
+
+Ajouter exactement cette redirect URL dans l’application LinkedIn :
+`https://VOTRE-DOMAINE/api/linkedin-callback`
+
+### Envoi email
+Ajouter l’intégration Resend ou créer une clé API, puis définir :
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL` (ex. `Boussole Flow <bilan@votredomaine.fr>`)
+
+### PDF
+Le bouton « Télécharger mon bilan complet (PDF) » ouvre un rapport complet prêt à être
+enregistré en PDF depuis la boîte de dialogue d’impression du navigateur.

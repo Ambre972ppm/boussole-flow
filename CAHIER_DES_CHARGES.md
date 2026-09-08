@@ -559,3 +559,51 @@ Pour les membres éligibles UE/EEE/Suisse, étudier l’intégration LinkedIn Me
 sous réserve de l’accès développeur et des autorisations LinkedIn.
 
 Ne jamais scraper un profil public à partir de son URL.
+
+
+---
+
+## V9.3 — Connexion LinkedIn directe
+
+Une connexion OAuth/OpenID Connect LinkedIn est ajoutée via Vercel Functions.
+
+Variables d’environnement :
+- `LINKEDIN_CLIENT_ID`
+- `LINKEDIN_CLIENT_SECRET`
+- `APP_URL`
+
+Scopes de test :
+- `openid`
+- `profile`
+- `email`
+
+Cette connexion récupère un profil léger (identité/photo/email autorisé).
+Elle ne doit pas être présentée comme une extraction complète du CV LinkedIn.
+L’historique pro reste importable via l’archive ZIP/CSV tant que les droits de portabilité ne sont pas accordés.
+
+## V9.3 — Envoi du bilan par email
+
+Le bilan complet peut être envoyé depuis l’écran de résultats via `/api/send-report`.
+
+Configuration Vercel :
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL` (optionnel, recommandé avec un domaine vérifié)
+
+L’email contient le rapport complet en HTML.
+
+## V9.3 — Export PDF complet
+
+Le bouton PDF ne doit plus imprimer l’écran courant.
+Il génère un document indépendant contenant :
+- identité professionnelle
+- points forts
+- axes d’évolution
+- conditions de durabilité
+- domaines
+- jusqu’à 6 métiers par domaine
+- justification
+- acquis
+- manques
+- mini-test
+
+Tous les accordéons sont donc inclus même s’ils sont fermés dans l’interface.
