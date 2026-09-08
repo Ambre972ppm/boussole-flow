@@ -607,3 +607,35 @@ Il génère un document indépendant contenant :
 - mini-test
 
 Tous les accordéons sont donc inclus même s’ils sont fermés dans l’interface.
+
+
+---
+
+## V9.4 — Navigation éditable
+
+L’utilisateur doit pouvoir revenir librement dans les sections :
+- Fonctionnement
+- Centres d’intérêt
+- Parcours
+- Diplômes
+- Compétences
+- Contraintes
+- Résultats
+
+Toute modification invalide le bilan précédent.
+L’interface affiche que des changements sont en attente puis propose de recalculer le bilan.
+
+Objectif : permettre la correction sans recommencer le questionnaire.
+
+## V9.4 — État de configuration LinkedIn
+
+Le bouton LinkedIn direct doit d’abord appeler `/api/linkedin-status`.
+
+Si les variables suivantes ne sont pas présentes :
+- `LINKEDIN_CLIENT_ID`
+- `LINKEDIN_CLIENT_SECRET`
+- `APP_URL`
+
+l’application doit l’expliquer clairement et ne pas lancer un OAuth voué à l’échec.
+
+L’import LinkedIn ZIP/CSV reste disponible indépendamment.

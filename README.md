@@ -53,3 +53,21 @@ Ajouter l’intégration Resend ou créer une clé API, puis définir :
 ### PDF
 Le bouton « Télécharger mon bilan complet (PDF) » ouvre un rapport complet prêt à être
 enregistré en PDF depuis la boîte de dialogue d’impression du navigateur.
+
+
+## V9.4 — Si LinkedIn direct ne fonctionne pas
+
+La connexion directe nécessite réellement :
+1. une application créée sur LinkedIn Developers ;
+2. le produit « Sign In with LinkedIn using OpenID Connect » activé ;
+3. les redirect URLs correctes ;
+4. dans Vercel :
+   - `LINKEDIN_CLIENT_ID`
+   - `LINKEDIN_CLIENT_SECRET`
+   - `APP_URL`
+
+La V9.4 vérifie désormais cette configuration avant de rediriger vers LinkedIn.
+
+## Navigation
+Une barre d’onglets permet maintenant de revenir dans chaque étape et de corriger les données.
+Après modification, le bilan est marqué comme à recalculer.
