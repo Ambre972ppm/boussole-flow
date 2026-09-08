@@ -49,3 +49,8 @@ button,input,select,textarea{font:inherit}.wrap{width:min(1100px,calc(100% - 28p
 .interest .chips{max-height:170px;overflow:auto;padding-right:4px}
 
 .connectedBadge{margin-top:14px;padding:11px 13px;border-radius:14px;background:#e7f3ea;border:1px solid #c9e2d0;color:#315b41;font-size:13px}
+
+.editNav{position:sticky;top:0;z-index:20;margin:14px 0 22px;display:flex;gap:7px;overflow:auto;padding:8px;background:rgba(250,247,255,.92);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px}
+.editNav button{flex:0 0 auto;border:0;background:transparent;color:var(--muted);padding:9px 11px;border-radius:12px;font-size:12px;font-weight:850;cursor:pointer}
+.editNav button.on{background:linear-gradient(135deg,var(--p1),var(--p2));color:white}
+.dirtyHint{margin:-12px 0 15px;font-size:11px;color:#8a6b22;background:#fff8e9;border:1px solid #ecdcb8;padding:7px 9px;border-radius:10px}
