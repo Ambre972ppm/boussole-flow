@@ -1,34 +1,21 @@
-# Boussole Flow — Projet complet V9
+# Boussole Flow — Projet complet V9.1
 
 ## Fichiers
-- `index.html` : structure principale
-- `styles.css` : design complet
-- `app.js` : questionnaire, import CV, matching, résultats
-- `CAHIER_DES_CHARGES.md` : cahier des charges consolidé à jour
+- `index.html`
+- `styles.css`
+- `app.js`
+- `CAHIER_DES_CHARGES.md`
+- `README.md`
 
-## Test local
-Ouvrir `index.html` dans un navigateur.
+## Correctif principal
+L'import PDF configure maintenant correctement le worker PDF.js :
+`GlobalWorkerOptions.workerSrc`.
 
-Pour tester correctement l’import CV PDF/DOCX, il est préférable de déployer sur Vercel
-car certaines bibliothèques sont chargées depuis le web.
+## Test navigateur
+Déployer le contenu de ce dossier sur la branche GitHub `V6-preview`,
+puis ouvrir la Preview Deployment Vercel dans Safari ou Chrome.
 
-## Déploiement Vercel
-1. mettre ces fichiers sur la branche `V6-preview`
-2. commit
-3. attendre la Preview Deployment Vercel
-4. ouvrir l’URL de preview dans Safari/Chrome
+## Import CV
+Formats testables : PDF avec texte sélectionnable, DOCX, TXT.
 
-## Fonctionnalités intégrées
-- 40 questions de fonctionnement
-- centres d’intérêt gradués 0–4
-- sous-thèmes pour passions fortes
-- taxonomie large
-- import CV PDF/DOCX/TXT
-- LinkedIn présenté comme connexion future
-- expériences structurées
-- diplômes conditionnels
-- compétences par niveau et source
-- contraintes réelles
-- résultats identité → forces → axes → conditions → domaines → métiers dépliables
-- accessibilité séparée de l’affinité
-- simple expérience de secteur = faible bonus seulement
+Un PDF scanné (image uniquement) nécessitera un futur module OCR.

@@ -478,3 +478,33 @@ Phrase de bas de page recommandée :
 7. sauvegarde serveur
 8. partage de bilan
 9. moteur sémantique plus robuste pour analyser missions et compétences
+
+---
+
+## Correctif technique V9.1 — Import CV
+
+### Formats de test
+- PDF texte
+- DOCX
+- TXT
+
+### PDF.js
+Le lecteur PDF doit charger explicitement :
+- `pdf.min.mjs`
+- `pdf.worker.min.mjs`
+
+`GlobalWorkerOptions.workerSrc` doit être défini avant l’appel à `getDocument()`.
+
+### Comportement attendu
+1. l’utilisateur choisit son CV ;
+2. le navigateur lit le texte ;
+3. Boussole détecte les expériences, formations et compétences ;
+4. aucune donnée détectée n’est utilisée silencieusement ;
+5. un écran de confirmation montre ce qui a été compris ;
+6. l’utilisateur peut supprimer/corriger les détections ;
+7. seulement après validation, les données alimentent le profil.
+
+### PDF scanné
+Un PDF constitué uniquement d’images ne contient pas de texte sélectionnable.
+Le prototype doit l’indiquer clairement plutôt que d’inventer des données.
+L’OCR est une fonctionnalité future distincte.

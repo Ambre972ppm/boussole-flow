@@ -4,24 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#5d3c9f">
-  <title>Boussole Flow — V9 projet complet</title>
+  <title>Boussole Flow — V9.1 test complet</title>
   <link rel="stylesheet" href="styles.css">
   <script>
 window.BF_CDN = {
   pdf: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs",
+  pdfWorker: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs",
   mammoth: "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"
 };
+
   </script>
 </head>
 <body>
-<main id="app">
-      <div style="max-width:900px;margin:32px auto;padding:24px;font-family:system-ui;color:#2d2441">
-        <div style="font-weight:900;letter-spacing:.08em">✦ BOUSSOLE FLOW</div>
-        <h1 style="font-family:Georgia,serif;font-size:40px;line-height:1.08;margin:24px 0 12px">Chargement de Boussole Flow…</h1>
-        <p style="color:#746b80">Le questionnaire va apparaître dans quelques secondes.</p>
-      </div>
-    </main>
-    <div id="bfRuntimeError" style="display:none;max-width:900px;margin:16px auto;padding:16px;border:1px solid #e2b9c6;background:#fff7f9;border-radius:14px;font-family:system-ui;color:#7a2442"></div>
+  <main id="app"></main>
+  <div id="bfRuntimeError" style="display:none"></div>
   <script src="app.js"></script>
 </body>
 </html>
