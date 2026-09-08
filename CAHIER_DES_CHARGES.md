@@ -508,3 +508,54 @@ Le lecteur PDF doit charger explicitement :
 Un PDF constitué uniquement d’images ne contient pas de texte sélectionnable.
 Le prototype doit l’indiquer clairement plutôt que d’inventer des données.
 L’OCR est une fonctionnalité future distincte.
+
+
+---
+
+## V9.2 — Centres d’intérêt élargis
+
+Chaque grand centre d’intérêt doit proposer un ensemble suffisamment riche de sous-thèmes.
+La taxonomie ne doit pas donner l’impression qu’un univers est limité à 3 ou 4 exemples.
+
+Exemple « Animaux » :
+- chiens
+- chats
+- chevaux
+- oiseaux
+- animaux de ferme
+- NAC
+- animaux marins
+- faune sauvage
+- reptiles
+- insectes
+- éducation animale
+- soins animaliers
+- protection animale
+- observation animale
+
+Chaque catégorie comporte aussi un champ **Autre / préciser**.
+Les éléments personnalisés sont conservés pour enrichir le profil, mais ne doivent pas produire
+de score automatique tant que le moteur ne sait pas les interpréter de façon fiable.
+
+## V9.2 — LinkedIn
+
+### Disponible immédiatement
+Import des données LinkedIn téléchargées par l’utilisateur :
+- archive ZIP
+- fichiers CSV
+
+Le prototype recherche notamment :
+- positions / expériences
+- dates
+- formations
+- compétences
+
+Les éléments détectés passent par le même écran de confirmation que le CV.
+
+### Connexion directe future
+Préparer une intégration OAuth sécurisée avec un backend.
+La connexion standard OpenID Connect ne suffit pas pour récupérer l’ensemble de l’historique professionnel.
+Pour les membres éligibles UE/EEE/Suisse, étudier l’intégration LinkedIn Member Portability API,
+sous réserve de l’accès développeur et des autorisations LinkedIn.
+
+Ne jamais scraper un profil public à partir de son URL.
