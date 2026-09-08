@@ -1,20 +1,21 @@
-# Boussole Flow V2
+# Boussole Flow — Projet complet V9.1
 
-Application d'exploration professionnelle conçue pour aider à identifier :
-- les moteurs de Flow,
-- les forces et ressources transférables,
-- les environnements de travail favorables,
-- les risques de décrochage,
-- des pistes métiers classées par compatibilité et accessibilité.
+## Fichiers
+- `index.html`
+- `styles.css`
+- `app.js`
+- `CAHIER_DES_CHARGES.md`
+- `README.md`
 
-## Déploiement GitHub Pages
+## Correctif principal
+L'import PDF configure maintenant correctement le worker PDF.js :
+`GlobalWorkerOptions.workerSrc`.
 
-Le projet est statique et ne nécessite aucun build.
+## Test navigateur
+Déployer le contenu de ce dossier sur la branche GitHub `V6-preview`,
+puis ouvrir la Preview Deployment Vercel dans Safari ou Chrome.
 
-1. Déposer `index.html`, `styles.css`, `app.js` et `.nojekyll` à la racine du dépôt.
-2. Dans GitHub : Settings → Pages.
-3. Source : Deploy from a branch.
-4. Branch : `main`, dossier `/ (root)`.
-5. Sauvegarder.
+## Import CV
+Formats testables : PDF avec texte sélectionnable, DOCX, TXT.
 
-Le site sera ensuite disponible sur l'URL GitHub Pages du dépôt.
+Un PDF scanné (image uniquement) nécessitera un futur module OCR.
